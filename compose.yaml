@@ -1,0 +1,43 @@
+services:
+  fake-llm:
+    build: ./fake-llm
+    container_name: asb-fake-llm
+    networks: [upstream]
+
+  sandbox:
+    build: ./sandbox
+    container_name: asb-sandbox
+    networks: [internal]
+    # Tout le trafic HTTP passe par mitm
+    # curl ne lit que la version minuscule pour le HTTP
+    environment:
+      http_proxy: http://mitm:8080
+      HTTP_PROXY: http://mitm:8080
+
+  mitm:
+    image: docker.io/mitmproxy/mitmproxy:latest
+    container_name: asb-mitm
+    # Contourne l'entrypoint de l'image : son gosu échoue en podman rootless
+    # Charge tous les addons du dossier (un -s par fichier), par ordre alphabétique
+    # $$ = $ littéral (sinon compose interprète $f comme une variable)
+    entrypoint: ["sh", "-c", "exec mitmdump $$(for f in /addons/*.py; do echo -s $$f; done)"]
+    # Addons montés, sans rebuild :
+    # - fichier modifié : rechargé automatiquement par mitmproxy
+    # - nouveau fichier : podman restart asb-mitm
+    volumes:
+      - ./mitm/addons:/addons:ro,Z
+    # Logs écrits immédiatement, sans buffer (sinon les tests lisent trop tôt)
+    environment:
+      PYTHONUNBUFFERED: "1"
+    # Sur les deux réseaux : seul pont entre sandbox et fake-llm
+    networks: [internal, upstream]
+
+networks:
+  # Réseau de la sandbox
+  # internal: true = pas de passerelle vers l'extérieur, donc pas d'accès Internet
+  # Les containers de ce réseau ne se parlent qu'entre eux
+  internal:
+    internal: true
+
+  # Réseau de fake-llm, séparé de la sandbox
+  upstream:
