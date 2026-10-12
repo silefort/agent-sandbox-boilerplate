@@ -1,0 +1,5 @@
+- Obfuscation bidirectionnelle des noms
+- Faire du HTTPS
+- Utiliser un vrai LLM, gérer le streaming 
+- Obfuscation des ips via des regex
+- Wrapper tout ça avec une CLI python ou go

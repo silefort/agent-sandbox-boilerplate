@@ -124,4 +124,44 @@ for addon in mitm/addons/*.py; do
 done
 echo "OK"
 
+echo "--- l'addon replace_occurencies de mitm est exécuté sur chaque requête"
+# Given la stack est up
+# just up > /dev/null 2>&1
+# When sandbox envoie une requête sur un chemin unique
+path="/replace_occurencies-test-$RANDOM"
+exec_container asb-sandbox curl -s --max-time 3 --data ping "http://fake-llm:8080$path" > /dev/null
+# Then l'addon replace_occurencies a loggé ce chemin dans les logs de mitm
+logs=$(podman logs asb-mitm 2>&1)
+echo "$logs" | grep "replace_occurencies addon: $path" > /dev/null && echo "OK" || { echo "FAIL"; exit 1; }
+
+echo "--- fake-llm ne reçoit pas foo"
+# Given la stack est up
+just up > /dev/null 2>&1
+# When sandbox envoie foo à fake-llm
+name=foo-$RANDOM
+exec_container asb-sandbox curl -s --max-time 3 --data $name http://fake-llm:8080/ -o /dev/null
+# Then body ne contient pas foo
+logs=$(podman logs asb-fake-llm 2>&1)
+(echo "$logs" | grep "$name" > /dev/null) ; code_retour=$?
+[ "$code_retour" != 0 ] && echo "OK" || { echo "FAIL"; exit 1; }
+
+
+echo "--- mitm change foo en bar"
+# Given la stack est up
+just up > /dev/null 2>&1
+# When sandbox envoie foo à fake-llm
+body=$(exec_container asb-sandbox curl -s --max-time 3 --data foo http://fake-llm:8080/)
+# Then body contient bar
+[ "$body" = "bar" ] && echo "OK" || { echo "FAIL"; exit 1; }
+
+echo "--- mitm change je suis foo en je suis bar"
+# Given la stack est up
+just up > /dev/null 2>&1
+# When sandbox envoie foo à fake-llm
+rand=$RANDOM
+body=$(exec_container asb-sandbox curl -s --max-time 3 --data "je suis foo $rand" http://fake-llm:8080/)
+# Then body contient bar
+[ "$body" = "je suis bar $rand" ] && echo "OK" || { echo "FAIL"; exit 1; }
+
+
 echo "Tous les tests sont OK"
