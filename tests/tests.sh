@@ -163,5 +163,17 @@ body=$(exec_container asb-sandbox curl -s --max-time 3 --data "je suis foo $rand
 # Then body contient bar
 [ "$body" = "je suis bar $rand" ] && echo "OK" || { echo "FAIL"; exit 1; }
 
+echo "--- mitm obfusque les requêtes en fonction des clés: valeurs de test.ini"
+# Given la stack est up
+just up > /dev/null 2>&1
+# When sandbox envoie les clés, elles doivent être remplacées par leur valeur
+FICHIER="tests/test.ini"
+
+while IFS='=' read -r cle valeur; do
+    body=$(exec_container asb-sandbox curl -s --max-time 3 --data "je suis $cle" http://fake-llm:8080/)
+    # Then body contient la valeur obfusquée
+    [ "$body" = "je suis $valeur" ] && echo "OK" || { echo "FAIL"; exit 1; }
+
+done < "$FICHIER"
 
 echo "Tous les tests sont OK"

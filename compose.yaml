@@ -15,7 +15,7 @@ services:
       HTTP_PROXY: http://mitm:8080
 
   mitm:
-    image: docker.io/mitmproxy/mitmproxy:latest
+    build: ./mitm
     container_name: asb-mitm
     # Contourne l'entrypoint de l'image : son gosu échoue en podman rootless
     # Charge tous les addons du dossier (un -s par fichier), par ordre alphabétique
