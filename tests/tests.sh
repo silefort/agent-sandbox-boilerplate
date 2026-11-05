@@ -143,14 +143,14 @@ for addon in mitm/addons/*.py; do
 done
 echo "OK"
 
-echo "--- l'addon replace_occurencies de mitm est exécuté sur chaque requête"
+echo "--- l'addon obfuscate_keyworks de mitm est exécuté sur chaque requête"
 # Given la stack est up
 # When sandbox envoie une requête sur un chemin unique
-path="/replace_occurencies-test-$RANDOM"
+path="/obfuscate_keyworks-test-$RANDOM"
 exec_container asb-sandbox curl -s --max-time 3 --data ping "http://fake-llm:8080$path" > /dev/null
-# Then l'addon replace_occurencies a loggé ce chemin dans les logs de mitm
+# Then l'addon obfuscate_keyworks a loggé ce chemin dans les logs de mitm
 logs=$(podman logs asb-mitm 2>&1)
-echo "$logs" | grep "replace_occurencies addon: $path" > /dev/null && echo "OK" || { echo "FAIL"; exit 1; }
+echo "$logs" | grep "obfuscate_keyworks addon: $path" > /dev/null && echo "OK" || { echo "FAIL"; exit 1; }
 
 echo "--- fake-llm ne reçoit pas foo"
 # Given la stack est up

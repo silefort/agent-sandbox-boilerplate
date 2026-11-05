@@ -38,7 +38,7 @@ asb-sandbox (alpine+curl)  →  asb-mitm (mitmproxy)  →  asb-fake-llm (echo Py
 | `mitm/` | Image mitmproxy + `pyyaml`. Lance `mitmdump` avec un `-s` par fichier `.py` de `/addons`. |
 | `mitm/addons/` | Règles de réécriture, montées en volume `:ro,Z`. |
 | `mitm/addons/noop.py` | Addon modèle : logge chaque requête, ne transforme rien. |
-| `mitm/addons/replace_occurencies.py` | Remplace les occurrences du body selon `conf.yaml`. |
+| `mitm/addons/obfuscate_keyworks.py` | Remplace les occurrences du body selon `conf.yaml`. |
 | `mitm/addons/conf.yaml` | Paires `clé: valeur` utilisées par l'addon de remplacement. |
 | `fake-llm/` | Serveur Python `HTTPServer` : logge le body POST reçu et le renvoie tel quel. |
 | `tests/tests.sh` | Tests bout-en-bout, exécutés **depuis l'hôte**. |
@@ -49,7 +49,7 @@ asb-sandbox (alpine+curl)  →  asb-mitm (mitmproxy)  →  asb-fake-llm (echo Py
 
 1. `curl` dans la sandbox lit `http_proxy` et contacte `mitm:8080`.
 2. `mitmdump` exécute les addons chargés (ordre alphabétique de fichier) :
-   `noop` logge le chemin, `replace_occurencies` remplace les occurrences dans le body.
+   `noop` logge le chemin, `obfuscate_keyworks` remplace les occurrences dans le body.
 3. La requête modifiée part vers `fake-llm:8080`, qui logge le body **modifié** et le renvoie.
 4. `curl` reçoit donc la version obfusquée.
 
@@ -103,7 +103,7 @@ podman exec asb-sandbox curl -s --data "bonjour" http://fake-llm:8080/
 - `entrypoint` de mitm : `$$` dans `compose.yaml` = `$` littéral (sinon compose interprète
   `$f` comme une variable). L'entrypoint de l'image mitmproxy est contourné car son `gosu`
   échoue en podman rootless.
-- `replace_occurencies.py` relit `conf.yaml` **à chaque requête** : modifiable sans restart.
+- `obfuscate_keyworks.py` relit `conf.yaml` **à chaque requête** : modifiable sans restart.
 - `flow.request.text` décode le body en texte → fragile sur du binaire / non-UTF-8.
 - Seul le hook `request` existe : obfuscation **unidirectionnelle** (rien sur la réponse).
 - La réécriture s'applique à **toutes** les requêtes proxifiées, pas uniquement au LLM.
