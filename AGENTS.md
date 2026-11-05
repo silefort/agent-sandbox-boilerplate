@@ -114,6 +114,12 @@ podman exec asb-sandbox curl -s --data "bonjour" http://fake-llm:8080/
 Obfuscation bidirectionnelle des noms, support HTTPS, vrai LLM avec streaming,
 obfuscation des IP par regex, wrapper CLI (Python ou Go).
 
+## Documents complémentaires pour l'agent
+
+Lire aussi ces fichiers (dossier `custom_agents/`, ignoré par git) :
+
+- [custom_agents/CUSTOM_AGENTS.md](custom_agents/CUSTOM_AGENTS.md)
+
 ## Préférences de communication
 
 ### Mode de travail : pair programming
