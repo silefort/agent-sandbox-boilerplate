@@ -13,6 +13,8 @@ tout son trafic HTTP passe par un proxy MITM, qui peut réécrire les requêtes 
 - Code, docs, commentaires et messages de commit en **français**.
 - Commits au format Conventional Commits, **sur une seule ligne**
   (ex. `perf: monter la stack une seule fois dans les tests`).
+- Développement en **TDD** : écrire d'abord les tests, les voir échouer,
+  puis développer la fonctionnalité jusqu'à les faire passer.
 
 ## Architecture
 
@@ -114,6 +116,13 @@ obfuscation des IP par regex, wrapper CLI (Python ou Go).
 
 ## Préférences de communication
 
+### Mode de travail : pair programming
+
+- On travaille en **pair programming** : ne pas implémenter seul de bout en bout.
+- Avancer par **petits incréments**, validés un par un avec moi.
+- Raccourcir les boucles de feedback : montrer tôt, montrer souvent.
+- Avant un changement non trivial, proposer l'approche et attendre mon accord.
+- Après chaque étape (test rouge, test vert, refacto), faire un point court.
 
 ### Style
 
