@@ -40,6 +40,7 @@ asb-sandbox (alpine+curl)  →  asb-mitm (mitmproxy)  →  asb-fake-llm (echo Py
 | `mitm/addons/noop.py` | Addon modèle : logge chaque requête, ne transforme rien. |
 | `mitm/addons/obfuscate_keywords.py` | Remplace les occurrences du body selon `conf.yaml`. |
 | `mitm/addons/conf.yaml` | Paires `clé: valeur` utilisées par l'addon de remplacement. |
+| `mitm/addons/obfuscate_ips.py` | Remplace chaque IPv4 du body par un jeton `IP_OBFUSQUEE_n`. |
 | `fake-llm/` | Serveur Python `HTTPServer` : logge le body POST reçu et le renvoie tel quel. |
 | `tests/tests.sh` | Tests bout-en-bout, exécutés **depuis l'hôte**. |
 | `tests/test.ini` | Jeu de paires `clé=valeur` utilisé par les tests. |
