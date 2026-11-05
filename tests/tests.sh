@@ -190,4 +190,11 @@ while IFS='=' read -r cle valeur; do
 
 done < "$FICHIER"
 
+echo "--- mitm obfusque une IP en jeton IP_OBFUSQUEE_n"
+# Given la stack est up
+# When sandbox envoie une IP à fake-llm
+body=$(exec_container asb-sandbox curl -s --max-time 3 --data "serveur 192.168.1.10" http://fake-llm:8080/)
+# Then body contient un jeton et plus l'IP
+[ "$body" = "serveur IP_OBFUSQUEE_1" ] && echo "OK" || { echo "FAIL"; exit 1; }
+
 echo "Tous les tests sont OK"
